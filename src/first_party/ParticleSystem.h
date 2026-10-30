@@ -44,7 +44,7 @@ public:
     float gravity_scale_y = 0.0f;
     float drag_factor = 1.0f;
     float angular_drag_factor = 1.0f;
-    float end_scale = std::nanf("");
+    float end_scale = -1.0f;
     int end_color_r = -1;
     int end_color_g = -1;
     int end_color_b = -1;
@@ -61,11 +61,11 @@ private:
 
     int local_frame_number = 0;
 
-    bool do_end_scale;
-    bool do_tint_r;
-    bool do_tint_g;
-    bool do_tint_b;
-    bool do_tint_a;
+    bool do_end_scale = false;
+    bool do_tint_r = false;
+    bool do_tint_g = false;
+    bool do_tint_b = false;
+    bool do_tint_a = false;
 
     RandomEngine emit_angle_distribution;
     RandomEngine emit_radius_distribution;

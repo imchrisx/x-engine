@@ -4,40 +4,53 @@
 #include "lua/lua.hpp"
 #include "LuaBridge/LuaBridge.h"
 
+#include <string>
 #include <memory>
-
-extern inline lua_State* lua_state = nullptr;
+#include <unordered_set>
+#include <vector>
 
 class ComponentDB
 {
 public:
 	static void Init();
-	static std::vector<std::string>& GetKeys(const std::string& component_type);
-	static void GetComponent(luabridge::LuaRef& ref, const std::string& component_type);
-	
-	template <typename T>
-	static void CreateCpp(luabridge::LuaRef& ref)
-	{
-		T* obj = new T();
-		ref = luabridge::LuaRef(lua_state, obj);
-	}
+	static luabridge::LuaRef* GetLuaComponent(const std::string& component_type);
 
-	template <typename T>
-	static void CreateCpp(luabridge::LuaRef& instance_table, luabridge::LuaRef& parent_table)
-	{
-		T* obj_parent = parent_table.cast<T*>();
-		instance_table = luabridge::LuaRef(lua_state, new T(*obj_parent));
-	}
+	static bool IsComponentTypeNative(std::string type);
+	static std::vector<std::string> GetAllComponentTypes();
 
-	static void EstablishInheritance(luabridge::LuaRef& instance_table, luabridge::LuaRef& parent_table);
-	static std::vector<std::string> ListAllComponentTypes();
-
-	static void ResetDatabase() { loaded_components.clear(); }
-
+	static const std::vector<std::string>& GetNativeKeys(const std::string& component_type);
 private:
 	static inline std::unordered_map<std::string, std::unique_ptr<luabridge::LuaRef>> loaded_components;
-	static std::vector<std::string>& FindKeys(luabridge::LuaRef ref);
-	static std::vector<std::string>& FindKeysCpp(const std::string& component_type);
+	static inline std::vector<std::string> components_types;
+	
+	static inline const std::vector<std::string> native_types = {
+	"Rigidbody",
+	"ParticleSystem",
+	//"SpriteRenderer"
+	};
+
+	static inline const std::unordered_set<std::string> native_types_set = {
+	"Rigidbody",
+	"ParticleSystem",
+	//"SpriteRenderer"
+	};
+
+	static inline const std::vector<std::string> rigidbody = {
+		"x", "y", "body_type", "precise", "gravity_scale",
+		"density", "angular_friction", "rotation", "has_collider",
+		"collider_type", "width", "height", "radius", "friction", "bounciness",
+		"has_trigger", "trigger_type", "trigger_width", "trigger_height", "trigger_radius"
+	};
+	static inline const std::vector<std::string> particle_system = {
+		"x", "y", "frames_between_bursts", "burst_quantity", "start_scale_min",
+		"start_scale_max", "rotation_min", "rotation_max", "start_color_r",
+		"start_color_g", "start_color_b", "start_color_a", "emit_radius_min",
+		"emit_radius_max", "emit_angle_min", "emit_angle_max", "image",
+		"sorting_order", "duration_frames", "start_speed_min", "start_speed_max",
+		"rotation_speed_min", "rotation_speed_max", "gravity_scale_x",
+		"gravity_scale_y", "drag_factor", "angular_drag_factor", "end_scale",
+		"end_color_r", "end_color_g", "end_color_b", "end_color_a"
+	};
 };
 
 #endif
